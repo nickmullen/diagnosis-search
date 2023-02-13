@@ -2,14 +2,14 @@ var express=require("express");
 var app=express();
 
 var bunyan = require("bunyan");
-const LOG_LEVEL = process.env.LOG_LEVEL || "debug";
+const LOG_LEVEL = process.env.LOG_LEVEL || "info";
 var log = bunyan.createLogger({name: "diagnosis-search", level: LOG_LEVEL});
 
 var axios=require("axios");
 
 var port = process.env.PORT || 3000;
 
-const ICD_CONTAINER = process.env.ICD_CONTAINER || "http://localhost:9000"
+const ICD_CONTAINER = process.env.ICD_CONTAINER_PATH || "http://localhost:9000"
 
 app.listen(port, () => {
     log.info("Diagnosis search service running on port %d", port);
@@ -17,15 +17,17 @@ app.listen(port, () => {
 });
 
 app.get("/search", (req, res) => {
+    let lang;
+    let errResponse = "";
     if (req.query.lang) {
-        if (["en", "ar"].includes(req.query.lang)) lang=req.query.lang
+        if (["en", "ar"].includes(req.query.lang)) lang=req.query.lang;
         else {
             log.warn("Request received for invalid language: ", req.query.lang)
-            res.status(400).send("Invalid lang - expected en or ar");
+            errResponse += "Invalid lang - expected en or ar: ";
         }
     }
     else lang="en";
-    if (req.query.q) {
+    if (req.query.q && lang) {
         log.info("Request received for", req.query.q);
         getFromIcd(req.query.q, lang)
         .then(result => {          
@@ -34,7 +36,10 @@ app.get("/search", (req, res) => {
                 returnArray.push({code: element.theCode, score: element.score, title: element.title});
               
             });
-            res.status(200).send(returnArray);
+            if (returnArray.length >0)
+                res.status(200).send(returnArray);
+            else
+                res.status(404).send("No entries found");
         })
         .catch((err) => {
             log.error(JSON.stringify(err));
@@ -42,7 +47,8 @@ app.get("/search", (req, res) => {
         });
     } else {
         log.warn("received GET at /search missing the search parameter");
-        res.status(400).send("Expected parameter q='something'");
+        if (!req.query.q) errResponse += "Expected parameter q='something' : ";
+        res.status(400).send(errResponse);
     }
 });
 
@@ -51,6 +57,8 @@ const getFromIcd = (query, language) => {
   return new Promise((resolve, reject) => {
     const url = ICD_CONTAINER + "/icd/release/11/2022-02/mms/search?q=" + query;
     log.debug ("Calling ICD-API at URL: %s", url);
+    if (!language) return reject("Missing Language");
+    else {
     axios( {
         method: 'get',
         url: url,
@@ -78,5 +86,6 @@ const getFromIcd = (query, language) => {
         } 
         return reject(new Error(err));
       });
+    }
   })
 }
