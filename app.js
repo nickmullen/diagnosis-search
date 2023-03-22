@@ -33,7 +33,8 @@ app.get("/search", (req, res) => {
         .then(result => {          
             var returnArray = [];
             result.destinationEntities.forEach(element => {
-                returnArray.push({code: element.theCode, score: element.score, title: element.title});
+                var decodedTitle= element.title.replace(/\<em class=\'found\'\>/g,'').replace(/\<\/em\>/g,'');
+                returnArray.push({code: element.theCode, score: element.score, title: element.title, plainTitle: decodedTitle});
               
             });
             if (returnArray.length >0)

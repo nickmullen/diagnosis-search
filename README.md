@@ -58,6 +58,10 @@ npm install
 npm run dev
 ```
 
+### Build a local docker container
+```
+docker build .
+```
 
 ### Envioronment variables
 - LOG_LEVEL: defaults to "info"
