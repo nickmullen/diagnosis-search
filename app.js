@@ -34,7 +34,6 @@ app.get("/search", (req, res) => {
             var returnArray = [];
             result.destinationEntities.forEach(element => {
                 var decodedTitle= element.title.replace(/\<em class=\'found\'\>/g,'').replace(/\<\/em\>/g,'');
-
                 returnArray.push({code: element.theCode, score: element.score, title: element.title, plainTitle: decodedTitle});
               
             });
