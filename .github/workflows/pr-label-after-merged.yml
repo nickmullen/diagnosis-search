@@ -1,0 +1,42 @@
+name: Label merged PR as "unreleased"
+
+on:
+  pull_request:
+    types: [closed]
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  label-after-merge:
+    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'master'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ensure label exists (create if missing)
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const {owner, repo} = context.repo;
+            const labelName = 'unreleased';
+            const color = '0e8a16'; // any color you like
+
+            try {
+              await github.rest.issues.getLabel({ owner, repo, name: labelName });
+              core.info(`Label "${labelName}" already exists.`);
+            } catch (e) {
+              core.info(`Creating label "${labelName}"...`);
+              await github.rest.issues.createLabel({ owner, repo, name: labelName, color, description: 'Newest merged changes not yet released' });
+            }
+
+      - name: Add "unreleased" to this PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const {owner, repo} = context.repo;
+            const prNumber = context.payload.pull_request.number;
+            await github.rest.issues.addLabels({
+              owner, repo, issue_number: prNumber, labels: ['unreleased']
+            });
+            core.info(`Added "unreleased" to PR #${prNumber}.`);
