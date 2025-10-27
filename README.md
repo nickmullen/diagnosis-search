@@ -2,7 +2,7 @@
 
 Wrapper for the WHO-ICD-11 api
 
-## What this project offers
+## What this project offers.
 
 A simplified GET interface that fronts onto the WHO-ICD-11 API and gives simpler results.
 Whereas the WHO Api offers very verbose output covering synonyms this API accepts a search term and returns a simple array:
