@@ -1,6 +1,6 @@
 # diagnosis-search
-Wrapper for the WHO-ICD-11 api
 
+Wrapper for the WHO-ICD-11 api
 
 ## What this project offers
 
@@ -8,13 +8,11 @@ A simplified GET interface that fronts onto the WHO-ICD-11 API and gives simpler
 Whereas the WHO Api offers very verbose output covering synonyms this API accepts a search term and returns a simple array:
 
 [
-  { code:
-    description: 
-    score: 0.05
-  }
+{ code:
+description:
+score: 0.05
+}
 ]
-
-
 
 # Getting Started
 
@@ -50,33 +48,39 @@ You may close the shell window or Ctrl-C to return to shell (container will cont
 ## Using this API wrapper
 
 ### Node
+
 The api was written using Node 16.19.0 - but doesn't use anything particularly special.
 
 ### To develop locally
+
 ```
 npm install
 npm run dev
 ```
 
 ### Build a local docker container
+
 ```
 docker build .
 ```
 
 ### Envioronment variables
+
 - LOG_LEVEL: defaults to "info"
 - PORT: the port the API will be available on default 3000
-- ICD_CONTAINER_PATH:  The location to call the ICD docker container. Default "http://localhost:9000"
-
+- ICD_CONTAINER_PATH: The location to call the ICD docker container. Default "http://localhost:9000"
 
 ### Making a query
+
 http://localhost:3000/search?q=malaria&lang=en
 http://localhost:3000/search?q=ملاريا&lang=ar
 
 There is just a single endpoint.
 
 ## Logs
+
 The log output is all to STDOUT
+
 ```
 {"name":"diagnosis-search","hostname":"WINDOWS-60A8M75","pid":26536,"level":30,"msg":"Diagnosis search service running on port 3000","time":"2023-02-13T11:51:19.643Z","v":0}
 {"name":"diagnosis-search","hostname":"WINDOWS-60A8M75","pid":26536,"level":30,"msg":"Expect to find an ICD-API listenting at http://localhost:9000","time":"2023-02-13T11:51:19.644Z","v":0}
